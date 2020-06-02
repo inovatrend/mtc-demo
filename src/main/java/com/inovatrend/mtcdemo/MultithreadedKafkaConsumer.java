@@ -45,7 +45,7 @@ public class MultithreadedKafkaConsumer implements Runnable, ConsumerRebalanceLi
             while (!stopped.get()) {
                 ConsumerRecords<String, String> records = consumer.poll(Duration.of(100, ChronoUnit.MILLIS));
                 handleFetchedRecords(records);
-                handleActiveTasks();
+                checkActiveTasks();
                 commitOffsets();
             }
         } catch (WakeupException we) {
@@ -87,9 +87,9 @@ public class MultithreadedKafkaConsumer implements Runnable, ConsumerRebalanceLi
     }
 
 
-    private void handleActiveTasks() {
+    private void checkActiveTasks() {
         List<TopicPartition> finishedTasksPartitions = new ArrayList<>();
-        activeTasks.forEach((partition, task) ->  {
+        activeTasks.forEach((partition, task) -> {
             if (task.isFinished())
                 finishedTasksPartitions.add(partition);
             long offset = task.getCurrentOffset();
@@ -97,7 +97,7 @@ public class MultithreadedKafkaConsumer implements Runnable, ConsumerRebalanceLi
                 offsetsToCommit.put(partition, new OffsetAndMetadata(offset));
         });
         finishedTasksPartitions.forEach(partition -> activeTasks.remove(partition));
-        consumer.resume( finishedTasksPartitions );
+        consumer.resume(finishedTasksPartitions);
     }
 
 
