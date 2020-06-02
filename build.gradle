@@ -1,0 +1,19 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.inovatrend'
+version = '1.0.0'
+sourceCompatibility = '1.8'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation("org.apache.kafka:kafka-clients:2.5.0")
+}
+
+test {
+    useJUnitPlatform()
+}
